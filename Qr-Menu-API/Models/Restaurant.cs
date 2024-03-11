@@ -40,6 +40,7 @@ namespace Qr_Menu_API.Models
 
         [Column(TypeName = "smalldatetime")]
         public DateTime RegisterDate { get; set; }
+
     }
 }
 

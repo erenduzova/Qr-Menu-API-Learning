@@ -36,6 +36,7 @@ namespace Qr_Menu_API.Models
 
         [ForeignKey("CompanyId")]
         public Company? Company { get; set; }
+
     }
 }
 

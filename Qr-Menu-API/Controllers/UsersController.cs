@@ -56,6 +56,7 @@ namespace Qr_Menu_API.Controllers
         {
             var existingApplicationUser =  _userManager.FindByIdAsync(id).Result;
 
+            existingApplicationUser.UserName = applicationUser.UserName;
             existingApplicationUser.Email = applicationUser.Email;
             existingApplicationUser.Name = applicationUser.Name;
             existingApplicationUser.PhoneNumber = applicationUser.PhoneNumber;

@@ -23,6 +23,7 @@ namespace Qr_Menu_API.Controllers
         }
 
         // GET: api/Companies
+        [Authorize(Roles = "Administrator")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Company>>> GetCompanies()
         {
@@ -34,6 +35,7 @@ namespace Qr_Menu_API.Controllers
         }
 
         // GET: api/Companies/5
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<Company>> GetCompany(int id)
         {
@@ -53,6 +55,7 @@ namespace Qr_Menu_API.Controllers
 
         // PUT: api/Companies/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Roles = "CompanyAdministrator")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCompany(int id, Company company)
         {
@@ -84,7 +87,7 @@ namespace Qr_Menu_API.Controllers
 
         // POST: api/Companies
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [Authorize]
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         public async Task<ActionResult<Company>> PostCompany(Company company)
         {
@@ -99,6 +102,7 @@ namespace Qr_Menu_API.Controllers
         }
 
         // DELETE: api/Companies/5
+        [Authorize(Roles = "Administrator,CompanyAdministrator")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCompany(int id)
         {

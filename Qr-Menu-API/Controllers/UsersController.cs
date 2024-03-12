@@ -16,12 +16,12 @@ namespace Qr_Menu_API.Controllers
     public class UsersController : ControllerBase
     {
         private readonly ApplicationContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public UsersController(ApplicationContext context, UserManager<ApplicationUser> userManager)
+        public UsersController(ApplicationContext context, SignInManager<ApplicationUser> signInManager)
         {
             _context = context;
-            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         // GET: api/Users
@@ -32,14 +32,14 @@ namespace Qr_Menu_API.Controllers
           {
               return NotFound();
           }
-            return await _userManager.Users.ToListAsync();
+            return await _signInManager.UserManager.Users.ToListAsync();
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
         public async Task<ActionResult<ApplicationUser>> GetApplicationUser(string id)
         {
-            var applicationUser = await _userManager.FindByIdAsync(id);
+            var applicationUser = await _signInManager.UserManager.FindByIdAsync(id);
 
             if (applicationUser == null)
             {
@@ -54,7 +54,7 @@ namespace Qr_Menu_API.Controllers
         [HttpPut("{id}")]
         public ActionResult PutApplicationUser(string id, ApplicationUser applicationUser, string? password = null, string? currentPassword = null)
         {
-            var existingApplicationUser =  _userManager.FindByIdAsync(id).Result;
+            var existingApplicationUser =  _signInManager.UserManager.FindByIdAsync(id).Result;
 
             existingApplicationUser.UserName = applicationUser.UserName;
             existingApplicationUser.Email = applicationUser.Email;
@@ -62,11 +62,11 @@ namespace Qr_Menu_API.Controllers
             existingApplicationUser.PhoneNumber = applicationUser.PhoneNumber;
             existingApplicationUser.StateId = applicationUser.StateId;
 
-            _userManager.UpdateAsync(existingApplicationUser).Wait();
+            _signInManager.UserManager.UpdateAsync(existingApplicationUser).Wait();
 
             if (password != null && currentPassword != null)
             {
-                IdentityResult identityResult = _userManager.ChangePasswordAsync(existingApplicationUser, currentPassword, password).Result;
+                IdentityResult identityResult = _signInManager.UserManager.ChangePasswordAsync(existingApplicationUser, currentPassword, password).Result;
             }
 
             return NoContent();
@@ -78,24 +78,47 @@ namespace Qr_Menu_API.Controllers
         public async Task<ActionResult<ApplicationUser>> PostApplicationUser(ApplicationUser applicationUser, string password)
         {
           
-            await _userManager.CreateAsync(applicationUser,password);   
+            await _signInManager.UserManager.CreateAsync(applicationUser,password);   
             
             return CreatedAtAction("GetApplicationUser", new { id = applicationUser.Id }, applicationUser);
         }
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteApplicationUser(string id)
+        public ActionResult DeleteApplicationUser(string id)
         {
-            var applicationUser = await _userManager.FindByIdAsync(id);
+            ApplicationUser applicationUser = _signInManager.UserManager.FindByIdAsync(id).Result;
             if (applicationUser == null)
             {
                 return NotFound();
             }
             applicationUser.StateId = 0;
-            await _userManager.UpdateAsync(applicationUser);
+            _signInManager.UserManager.UpdateAsync(applicationUser);
 
-            return NoContent();
+            return Ok();
+        }
+
+        // api/Users/LogIn
+        [HttpPost("LogIn")]
+        public bool LogIn(string userName, string password)
+        {
+            ApplicationUser applicationUser = _signInManager.UserManager.FindByNameAsync(userName).Result;
+
+            if (applicationUser == null)
+            {
+                // User not found
+                return false;
+            }
+
+            Microsoft.AspNetCore.Identity.SignInResult result = _signInManager.PasswordSignInAsync(applicationUser, password, true, false).Result;
+
+            if (result.Succeeded)
+            {
+                return true;
+            }
+
+            return false;
+
         }
 
         private bool ApplicationUserExists(string id)

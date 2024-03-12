@@ -115,6 +115,24 @@ namespace Qr_Menu_API.Controllers
             return (signInResult.Succeeded);
         }
 
+        // api/Users/ResetPassword
+        [HttpPost("ResetPassword")]
+        public void resetPassword(string userName, string password)
+        {
+            ApplicationUser applicationUser = _signInManager.UserManager.FindByNameAsync(userName).Result;
+
+            if (applicationUser == null)
+            {
+                // User not found
+                return;
+            }
+
+            _signInManager.UserManager.RemovePasswordAsync(applicationUser).Wait();
+            _signInManager.UserManager.AddPasswordAsync(applicationUser, password);
+
+            return;
+        }
+
         private bool ApplicationUserExists(string id)
         {
             return (_context.Users?.Any(e => e.Id == id)).GetValueOrDefault();

@@ -110,15 +110,9 @@ namespace Qr_Menu_API.Controllers
                 return false;
             }
 
-            Microsoft.AspNetCore.Identity.SignInResult result = _signInManager.PasswordSignInAsync(applicationUser, password, true, false).Result;
+            Microsoft.AspNetCore.Identity.SignInResult signInResult = _signInManager.PasswordSignInAsync(applicationUser, password, false, false).Result;
 
-            if (result.Succeeded)
-            {
-                return true;
-            }
-
-            return false;
-
+            return (signInResult.Succeeded);
         }
 
         private bool ApplicationUserExists(string id)

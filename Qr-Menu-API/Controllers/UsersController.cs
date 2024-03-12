@@ -117,7 +117,7 @@ namespace Qr_Menu_API.Controllers
 
         // api/Users/ResetPassword
         [HttpPost("ResetPassword")]
-        public void resetPassword(string userName, string password)
+        public void ResetPassword(string userName, string password)
         {
             ApplicationUser applicationUser = _signInManager.UserManager.FindByNameAsync(userName).Result;
 
@@ -128,10 +128,43 @@ namespace Qr_Menu_API.Controllers
             }
 
             _signInManager.UserManager.RemovePasswordAsync(applicationUser).Wait();
-            _signInManager.UserManager.AddPasswordAsync(applicationUser, password);
+            _signInManager.UserManager.AddPasswordAsync(applicationUser, password).Wait();
 
             return;
         }
+
+        // api/Users/ResetPasswordGenerateToken
+        [HttpPost("ResetPasswordGenerateToken")]
+        public string? ResetPasswordGenerateToken(string userName)
+        {
+            ApplicationUser applicationUser = _signInManager.UserManager.FindByNameAsync(userName).Result;
+            if (applicationUser == null)
+            {
+                // User not found
+                return null;
+            }
+
+            return _signInManager.UserManager.GeneratePasswordResetTokenAsync(applicationUser).Result;
+        }
+
+        // api/Users/ResetPasswordValidateToken
+        [HttpPost("ResetPasswordValidateToken")]
+        public ActionResult<String> ResetPasswordValidateToken(string userName, string token, string newPassword)
+        {
+            ApplicationUser applicationUser = _signInManager.UserManager.FindByNameAsync(userName).Result;
+            if (applicationUser == null)
+            {
+                // User not found
+                return NotFound();
+            }
+            IdentityResult identityResult = _signInManager.UserManager.ResetPasswordAsync(applicationUser, token, newPassword).Result;
+            if (identityResult.Succeeded == false)
+            {
+                return identityResult.Errors.First().Description;
+            }
+            return Ok();
+        } 
+
 
         private bool ApplicationUserExists(string id)
         {

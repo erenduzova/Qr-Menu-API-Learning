@@ -38,10 +38,6 @@ namespace Qr_Menu_API.Data
                 new State { Id = 1, Name = "Active" },
                 new State { Id = 2, Name = "Passive" });
 
-            builder.Entity<IdentityRole>().HasData(
-                new IdentityRole { Name = "Administrator"},
-                new IdentityRole { Name = "CompanyAdministrator"});
-
 
             base.OnModelCreating(builder);
         }

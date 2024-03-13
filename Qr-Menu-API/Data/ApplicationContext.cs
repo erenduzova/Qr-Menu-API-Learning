@@ -32,13 +32,6 @@ namespace Qr_Menu_API.Data
 
             builder.Entity<RestaurantUser>().HasKey(ru => new { ru.UserId, ru.RestaurantId });
 
-
-            builder.Entity<State>().HasData(
-                new State { Id = 0, Name = "Delete" },
-                new State { Id = 1, Name = "Active" },
-                new State { Id = 2, Name = "Passive" });
-
-
             base.OnModelCreating(builder);
         }
 

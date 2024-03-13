@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Qr_Menu_API.Data;
 using Qr_Menu_API.Models;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Qr_Menu_API;
 
@@ -51,6 +53,18 @@ public class Program
                     State statePassive = new State(2, "Passive");
                     applicationContext.States.Add(statePassive);
                 }
+                if (applicationContext.Companies.Count() == 0)
+                {
+                    Company company = new Company();
+                    company.AddressDetails = "adres";
+                    company.EMail = "abc@def.com";
+                    company.Name = "Company";
+                    company.Phone = "1112223344";
+                    company.PostalCode = "12345";
+                    company.RegisterDate = DateTime.Today;
+                    company.StateId = 1;
+                    company.TaxNumber = "11111111111";
+                    applicationContext.Companies.Add(company);
                 applicationContext.SaveChanges();
                 RoleManager<IdentityRole>? roleManager = app.Services.CreateScope().ServiceProvider.GetService<RoleManager<IdentityRole>>();
                 if (roleManager != null)
@@ -68,11 +82,23 @@ public class Program
                 {
                     if (roleManager.Roles.Count() == 0)
                     {
-                        ApplicationUser applicationUser = new ApplicationUser();
-                        applicationUser.UserName = "Administrator";
-                        userManager.CreateAsync(applicationUser, "Admin123!").Wait();
-                        userManager.AddToRoleAsync(applicationUser, "Administrator").Wait();
+                        if ( company != null)
+                        {
+
+                            ApplicationUser applicationUser = new ApplicationUser();
+                            applicationUser.UserName = "Administrator";
+                            applicationUser.CompanyId = company.Id;
+                            applicationUser.Name = "Administrator";
+                            applicationUser.Email = "abc@def.com";
+                            applicationUser.PhoneNumber = "1112223344";
+                            applicationUser.RegisterDate = DateTime.Today;
+                            applicationUser.StateId = 1;
+
+                            userManager.CreateAsync(applicationUser, "Admin123!").Wait();
+                            userManager.AddToRoleAsync(applicationUser, "Administrator").Wait();
+                        }
                     }
+                }
                 }
             }
         }

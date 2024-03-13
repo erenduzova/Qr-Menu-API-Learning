@@ -15,24 +15,20 @@ namespace Qr_Menu_API.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly ApplicationContext _context;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UsersController(ApplicationContext context, SignInManager<ApplicationUser> signInManager)
+        public UsersController(SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager)
         {
-            _context = context;
             _signInManager = signInManager;
+            _roleManager = roleManager;
         }
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ApplicationUser>>> GetUsers()
+        public ActionResult<List<ApplicationUser>> GetUsers()
         {
-          if (_context.Users == null)
-          {
-              return NotFound();
-          }
-            return await _signInManager.UserManager.Users.ToListAsync();
+            return _signInManager.UserManager.Users.ToList();
         }
 
         // GET: api/Users/5
@@ -52,9 +48,9 @@ namespace Qr_Menu_API.Controllers
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public ActionResult PutApplicationUser(string id, ApplicationUser applicationUser, string? password = null, string? currentPassword = null)
+        public ActionResult PutApplicationUser(ApplicationUser applicationUser)
         {
-            var existingApplicationUser =  _signInManager.UserManager.FindByIdAsync(id).Result;
+            ApplicationUser existingApplicationUser =  _signInManager.UserManager.FindByIdAsync(applicationUser.Id).Result;
 
             existingApplicationUser.UserName = applicationUser.UserName;
             existingApplicationUser.Email = applicationUser.Email;
@@ -64,23 +60,16 @@ namespace Qr_Menu_API.Controllers
 
             _signInManager.UserManager.UpdateAsync(existingApplicationUser).Wait();
 
-            if (password != null && currentPassword != null)
-            {
-                IdentityResult identityResult = _signInManager.UserManager.ChangePasswordAsync(existingApplicationUser, currentPassword, password).Result;
-            }
-
-            return NoContent();
+            return Ok();
         }
 
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<ApplicationUser>> PostApplicationUser(ApplicationUser applicationUser, string password)
+        public string PostApplicationUser(ApplicationUser applicationUser, string passWord)
         {
-          
-            await _signInManager.UserManager.CreateAsync(applicationUser,password);   
-            
-            return CreatedAtAction("GetApplicationUser", new { id = applicationUser.Id }, applicationUser);
+            _signInManager.UserManager.CreateAsync(applicationUser, passWord).Wait();
+            return applicationUser.Id;
         }
 
         // DELETE: api/Users/5
@@ -163,12 +152,16 @@ namespace Qr_Menu_API.Controllers
                 return identityResult.Errors.First().Description;
             }
             return Ok();
-        } 
-
-
-        private bool ApplicationUserExists(string id)
-        {
-            return (_context.Users?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+
+        [HttpPost("AssignRole")]
+        public void AssignRole(string userId, string roleId)
+        {
+            ApplicationUser applicationUser = _signInManager.UserManager.FindByIdAsync(userId).Result;
+            IdentityRole identityRole = _roleManager.FindByIdAsync(roleId).Result;
+
+            _signInManager.UserManager.AddToRoleAsync(applicationUser, identityRole.Name).Wait();
+        }
+
     }
 }

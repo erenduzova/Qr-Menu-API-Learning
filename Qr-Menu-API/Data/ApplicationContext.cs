@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Qr_Menu_API.Models;
@@ -34,6 +35,16 @@ namespace Qr_Menu_API.Data
             builder.Entity<RestaurantUser>().HasOne(ru => ru.ApplicationUser).WithMany().OnDelete(DeleteBehavior.NoAction);
 
             builder.Entity<RestaurantUser>().HasKey(ru => new { ru.UserId, ru.RestaurantId });
+
+
+            builder.Entity<State>().HasData(
+                new State { Id = 0, Name = "Delete" },
+                new State { Id = 1, Name = "Active" },
+                new State { Id = 2, Name = "Passive" });
+
+            builder.Entity<IdentityRole>().HasData(
+                new IdentityRole("Administrator"));
+
 
             base.OnModelCreating(builder);
         }

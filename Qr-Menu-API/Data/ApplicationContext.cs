@@ -22,14 +22,10 @@ namespace Qr_Menu_API.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<ApplicationUser>().HasOne(u => u.State).WithMany().OnDelete(DeleteBehavior.NoAction);
+            builder.Entity<Company>().HasOne(c => c.State).WithMany().OnDelete(DeleteBehavior.NoAction);
             builder.Entity<Restaurant>().HasOne(r => r.State).WithMany().OnDelete(DeleteBehavior.NoAction);
             builder.Entity<Category>().HasOne(c => c.State).WithMany().OnDelete(DeleteBehavior.NoAction);
             builder.Entity<Food>().HasOne(f => f.State).WithMany().OnDelete(DeleteBehavior.NoAction);
-
-
-            builder.Entity<Restaurant>().HasOne(r => r.Company).WithMany().OnDelete(DeleteBehavior.NoAction);
-            builder.Entity<Category>().HasOne(c => c.Restaurant).WithMany().OnDelete(DeleteBehavior.NoAction);
-            builder.Entity<Food>().HasOne(f => f.Category).WithMany().OnDelete(DeleteBehavior.NoAction);
 
             builder.Entity<RestaurantUser>().HasOne(ru => ru.Restaurant).WithMany().OnDelete(DeleteBehavior.NoAction);
             builder.Entity<RestaurantUser>().HasOne(ru => ru.ApplicationUser).WithMany().OnDelete(DeleteBehavior.NoAction);
@@ -43,7 +39,8 @@ namespace Qr_Menu_API.Data
                 new State { Id = 2, Name = "Passive" });
 
             builder.Entity<IdentityRole>().HasData(
-                new IdentityRole("Administrator"));
+                new IdentityRole { Name = "Administrator"},
+                new IdentityRole { Name = "CompanyAdministrator"});
 
 
             base.OnModelCreating(builder);

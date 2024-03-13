@@ -13,6 +13,11 @@ namespace Qr_Menu_API.Models
 		[Column(TypeName = "nvarchar(10)")]
 		public string Name { get; set; } = "";
 
-	}
+        public State(byte id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
+    }
 }
 

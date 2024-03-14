@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Qr_Menu_API.Data;
@@ -16,10 +17,12 @@ namespace Qr_Menu_API.Controllers
     public class CompaniesController : ControllerBase
     {
         private readonly ApplicationContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public CompaniesController(ApplicationContext context)
+        public CompaniesController(ApplicationContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: api/Companies
@@ -89,16 +92,24 @@ namespace Qr_Menu_API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [Authorize(Roles = "Administrator")]
         [HttpPost]
-        public async Task<ActionResult<Company>> PostCompany(Company company)
+        public int PostCompany(Company company)
         {
-          if (_context.Companies == null)
-          {
-              return Problem("Entity set 'ApplicationContext.Companies'  is null.");
-          }
-            _context.Companies.Add(company);
-            await _context.SaveChangesAsync();
+            ApplicationUser applicationUser = new ApplicationUser();
 
-            return CreatedAtAction("GetCompany", new { id = company.Id }, company);
+            _context.Companies.Add(company);
+            _context.SaveChanges();
+
+            applicationUser.CompanyId = company.Id;
+            applicationUser.Email = "abc@def.com";
+            applicationUser.Name = "Administrator";
+            applicationUser.PhoneNumber = "1112223344";
+            applicationUser.RegisterDate = DateTime.Today;
+            applicationUser.StateId = 1;
+            applicationUser.UserName = "Administrator" + company.Id.ToString();
+            _userManager.CreateAsync(applicationUser).Wait();
+            _userManager.AddToRoleAsync(applicationUser, "CompanyAdministrator").Wait();
+
+            return company.Id;
         }
 
         // DELETE: api/Companies/5

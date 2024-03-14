@@ -108,6 +108,8 @@ namespace Qr_Menu_API.Controllers
             applicationUser.StateId = 1;
             applicationUser.UserName = "Administrator" + company.Id.ToString();
             _userManager.CreateAsync(applicationUser, "Admin123!").Wait();
+            Claim claim = new Claim("CompanyId", company.Id.ToString());
+            _userManager.AddClaimAsync(applicationUser, claim).Wait();
             _userManager.AddToRoleAsync(applicationUser, "CompanyAdministrator").Wait();
 
 

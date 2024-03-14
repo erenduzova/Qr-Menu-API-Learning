@@ -44,7 +44,7 @@ public class Program
             if (applicationContext != null)
             {
                 applicationContext.Database.Migrate();
-                if (applicationContext.States.Count() == 0)
+                if (!applicationContext.States.Any())
                 {
                     State stateDeleted = new State(0, "Deleted");
                     applicationContext.States.Add(stateDeleted);
@@ -53,7 +53,7 @@ public class Program
                     State statePassive = new State(2, "Passive");
                     applicationContext.States.Add(statePassive);
                 }
-                if (applicationContext.Companies.Count() == 0)
+                if (!applicationContext.Companies.Any())
                 {
                     Company company = new Company();
                     company.AddressDetails = "adres";
@@ -69,7 +69,7 @@ public class Program
                     RoleManager<IdentityRole>? roleManager = app.Services.CreateScope().ServiceProvider.GetService<RoleManager<IdentityRole>>();
                     if (roleManager != null)
                     {
-                        if (roleManager.Roles.Count() == 0)
+                        if (!roleManager.Roles.Any())
                         {
                             IdentityRole administratorRole = new IdentityRole("Administrator");
                             roleManager.CreateAsync(administratorRole).Wait();
@@ -80,7 +80,7 @@ public class Program
                     UserManager<ApplicationUser>? userManager = app.Services.CreateScope().ServiceProvider.GetService<UserManager<ApplicationUser>>();
                     if (userManager != null)
                     {
-                        if (roleManager.Roles.Count() != 0)
+                        if (!userManager.Users.Any())
                         {
                             if (company != null)
                             {

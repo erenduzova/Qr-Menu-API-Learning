@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -106,8 +107,9 @@ namespace Qr_Menu_API.Controllers
             applicationUser.RegisterDate = DateTime.Today;
             applicationUser.StateId = 1;
             applicationUser.UserName = "Administrator" + company.Id.ToString();
-            _userManager.CreateAsync(applicationUser).Wait();
+            _userManager.CreateAsync(applicationUser, "Admin123!").Wait();
             _userManager.AddToRoleAsync(applicationUser, "CompanyAdministrator").Wait();
+
 
             return company.Id;
         }

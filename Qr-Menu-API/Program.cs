@@ -23,7 +23,7 @@ public class Program
         builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
             .AddEntityFrameworkStores<ApplicationContext>().AddDefaultTokenProviders();
         builder.Services.AddAuthentication();
-        builder.Services.AddAuthorization();
+        builder.Services.AddAuthorization(options => options.AddPolicy("CompAdmin", policy => policy.RequireClaim("CompanyId")));
 
         var app = builder.Build();
 

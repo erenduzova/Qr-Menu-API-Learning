@@ -59,7 +59,8 @@ namespace Qr_Menu_API.Controllers
 
         // PUT: api/Companies/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [Authorize(Roles = "CompanyAdministrator")]
+        //[Authorize(Roles = "CompanyAdministrator")]
+        [Authorize(Policy ="CompAdmin")]
         [HttpPut("{id}")]
         public ActionResult PutCompany(int id, Company company)
         {
